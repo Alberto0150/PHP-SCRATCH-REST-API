@@ -68,6 +68,7 @@
             $this->category_name = $row['category_name'];
         }
 
+        // Create Post
         public function create(){
             //  Create query
             //  : to use named parameter in PDO
@@ -95,6 +96,76 @@
             $statement->bindParam(':body', $this->body);
             $statement->bindParam(':author', $this->author);
             $statement->bindParam(':category_id', $this->category_id);
+
+            //  Exec query
+            if($statement->execute()){
+                return true;
+            }
+
+            // Print the error if something wrong
+            printf("Error: %s. \n", $statement->error);
+            return false;
+        }
+
+        // Update post
+        public function update(){
+            //  Create query
+            //  : to use named parameter in PDO
+            $query = 'UPDATE '. $this->table . '
+            SET
+                title = :title,
+                body = :body,
+                author = :author,
+                category_id = :category_id
+            WHERE
+                id = :id';
+
+            // Prepare statement
+            $statement = $this->connection->prepare($query);
+        
+            // Clean Data
+            // htmlspecialchars() to prevent any html code special character 
+            // strip_tags()) to strip any tags
+            $this->title = htmlspecialchars(strip_tags($this->title));
+            $this->body = htmlspecialchars(strip_tags($this->body));
+            $this->author = htmlspecialchars(strip_tags($this->author));
+            $this->category_id = htmlspecialchars(strip_tags($this->category_id));
+            $this->id = htmlspecialchars(strip_tags($this->id));
+
+            // Bind data
+            // to binding created query with specific. format: placebolder, what_to_bind
+            $statement->bindParam(':title', $this->title);
+            $statement->bindParam(':body', $this->body);
+            $statement->bindParam(':author', $this->author);
+            $statement->bindParam(':category_id', $this->category_id);
+            $statement->bindParam(':id', $this->id);
+
+            //  Exec query
+            if($statement->execute()){
+                return true;
+            }
+
+            // Print the error if something wrong
+            printf("Error: %s. \n", $statement->error);
+            return false;
+        }
+
+        // Delete post
+        public function delete() {
+            //  Create query
+            //  : to use named parameter in PDO
+            $query = 'DELETE FROM '. $this->table . '
+            WHERE
+                id = :id';
+
+            // Prepare statement
+            $statement = $this->connection->prepare($query);
+
+            // Clean Data
+            $this->id = htmlspecialchars(strip_tags($this->id));
+
+            // Bind data
+            $statement->bindParam(':id', $this->id);
 
             //  Exec query
             if($statement->execute()){
